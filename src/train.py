@@ -1,4 +1,5 @@
 import json
+import os
 import sys
 from pathlib import Path
 import torch
@@ -33,6 +34,10 @@ def train_one_epoch(
         _, predicted = outputs.max(1)
         total += targets.size(0)
         correct += predicted.eq(targets).sum().item()
+        
+        if (batch_idx + 1) % 50 == 0:
+            print(f"  [Batch {batch_idx + 1}/{len(loader)}] Current Loss: {loss.item():.4f}", flush=True)
+
     avg_loss = total_loss / total
     accuracy = correct / total
     return avg_loss, accuracy
@@ -66,7 +71,7 @@ def main():
         config_path = Path("configs/training_config.yaml")
     
     config = load_config(str(config_path))
-    device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
     model = get_model(
         architecture=config["model"]["architecture"],
@@ -92,6 +97,7 @@ def main():
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
 
     for epoch in range(config["training"]["epochs"]):
+        print(f"--- Epoch {epoch + 1}/{config['training']['epochs']} Starting ---", flush=True)
         train_loss, train_acc = train_one_epoch(
             model, train_loader, optimizer, criterion, device
         )
