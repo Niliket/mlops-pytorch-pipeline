@@ -1,0 +1,21 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+
+# ML artifacts & datasets
+data/
+checkpoints/
+*.pt
+*.pth
+*.onnx
+
+# IDE & OS files
+.DS_Store
+.vscode/
+.idea/
