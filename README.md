@@ -37,9 +37,11 @@ An end-to-end Machine Learning deployment pipeline featuring containerized PyTor
 | Client /   | |             | (Port Forward)                  |
 | cURL Test  |-+-------------+                                 |
 +------------+ +-----------------------------------------------+
+```
+---
 
-##Project Structure
-
+## Project Structure
+```
 mlops-pytorch-pipeline/
 ├── .github/workflows/
 │   └── ci.yml                     # GitHub Actions CI workflow
@@ -69,17 +71,18 @@ mlops-pytorch-pipeline/
 └── .gitignore
 └── README.md
 └── test_image.png
+```
+---
 
-
-##Prerequisites
+## Prerequisites
 macOS / Linux environment
 Docker Desktop (running)
 Minikube & kubectl
 Python 3.11 with pip
 
-##Local Development & Docker Verification
+## Local Development & Docker Verification
 
-###1. Build Multi-Stage Docker Images
+### 1. Build Multi-Stage Docker Images
 ```
 bash
 # Build training image
@@ -89,7 +92,7 @@ docker build -f docker/Dockerfile.train -t mlops-train:v1 .
 docker build -f docker/Dockerfile.serve -t mlops-serve:v1 .
 ```
 
-###2. Local Training Run
+### 2. Local Training Run
 ```
 bash
 docker run --rm \
@@ -99,7 +102,7 @@ docker run --rm \
   mlops-train:v1
 ```
 
-###3. Local Serving and Prediction test
+### 3. Local Serving and Prediction test
 
 ```
 bash
