@@ -75,10 +75,12 @@ mlops-pytorch-pipeline/
 ---
 
 ## Prerequisites
-macOS / Linux environment
-Docker Desktop (running)
-Minikube & kubectl
-Python 3.11 with pip
+- macOS / Linux environment
+- Docker Desktop (running)
+- Minikube & kubectl
+- Python 3.11 with pip
+
+---
 
 ## Local Development & Docker Verification
 
@@ -121,3 +123,73 @@ curl -X POST http://localhost:8080/predict -F "image=@test_image.png"
 # Cleanup
 docker stop local-serve && docker rm local-serve
 ```
+
+---
+
+## Kubernetes Deployment (Minikube)
+
+### 1. Loading local Docker images to Kubernetes
+```
+bash
+minikube image load mlops-train:v1
+minikube image load mlops-serve:v1
+```
+
+### 2. Applying storage, configuration and namespace
+```
+bash
+kubectl apply -f k8s/namespace.yaml
+kubectl apply -f k8s/configmap.yaml
+kubectl apply -f k8s/pvc.yaml
+```
+
+### 3. Running Kubernetes training jobs
+```
+bash
+# Launch training job
+kubectl apply -f k8s/training-job.yaml
+
+# Stream training logs
+kubectl logs -f job/pytorch-training-job -n ml-training
+```
+
+### 4. Deploy serving layer and HPA
+```
+bash
+kubectl apply -f k8s/serving-deployment.yaml
+kubectl apply -f k8s/serving-service.yaml
+kubectl apply -f k8s/hpa.yaml
+```
+
+### 5. Verifying running services
+```
+bash
+kubectl get pods -n ml-training
+kubectl get svc -n ml-training
+kubectl describe deployment model-serving -n ml-training
+```
+
+### 6. Port forwarding and test prediction
+
+```
+bash
+# Port-forward the service to localhost:8080
+kubectl port-forward svc/model-serving 8080:80 -n ml-training
+
+# Prediction test
+curl -X POST http://localhost:8080/predict -F "image=@test_image.png"
+```
+
+---
+
+## GitHub Flow & Release branches
+
+- main: Production release branch (tagged v1.0.0)
+
+- develop: Integration branch for CI validation
+
+- feature/model-pipeline: PyTorch training script, ResNet architecture, and tests
+
+- feature/docker-containerization: Multi-stage Docker builds and runtime setup
+
+- feature/k8s-deployment: Kubernetes Job, Deployment, PVC, Service, and HPA
